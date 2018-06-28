@@ -95,8 +95,8 @@ func (b *Block) proofOfWork() {
 	}
 }
 
-// Serialize serializes the block
-func (b *Block) Serialize() []byte {
+// serialize serializes the block
+func (b *Block) serialize() []byte {
 	var result bytes.Buffer
 	encoder := gob.NewEncoder(&result)
 
@@ -108,8 +108,8 @@ func (b *Block) Serialize() []byte {
 	return result.Bytes()
 }
 
-// DeserializeBlock deserializes a block
-func DeserializeBlock(d []byte) *Block {
+// deserializeBlock deserializes a block
+func deserializeBlock(d []byte) *Block {
 	var block Block
 
 	decoder := gob.NewDecoder(bytes.NewReader(d))

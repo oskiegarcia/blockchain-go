@@ -47,7 +47,7 @@ func (bc *Blockchain) AddBlock(newBlock *Block) error {
 
 	err := bc.Db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blocksBucket))
-		err := b.Put(newBlock.Hash, newBlock.Serialize())
+		err := b.Put(newBlock.Hash, newBlock.serialize())
 		if err != nil {
 			log.Panic(err)
 		}
@@ -88,7 +88,7 @@ func NewBlockchain() *Blockchain {
 				log.Panic(err)
 			}
 
-			err = b.Put(genesis.Hash, genesis.Serialize())
+			err = b.Put(genesis.Hash, genesis.serialize())
 			if err != nil {
 				log.Panic(err)
 			}
@@ -151,7 +151,7 @@ func (i *BlockchainIterator) next() *Block {
 	err := i.Db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blocksBucket))
 		encodedBlock := b.Get(i.currentHash)
-		block = DeserializeBlock(encodedBlock)
+		block = deserializeBlock(encodedBlock)
 
 		return nil
 	})
@@ -175,7 +175,7 @@ func (bc *Blockchain) lastBlock() *Block {
 		lastHash := b.Get([]byte("l"))
 		log.Printf("lastHash:%s\n", string(lastHash))
 		encodedBlock := b.Get(lastHash)
-		block = DeserializeBlock(encodedBlock)
+		block = deserializeBlock(encodedBlock)
 		//spew.Dump(block)
 		return nil
 	})
