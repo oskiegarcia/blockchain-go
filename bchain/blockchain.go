@@ -1,13 +1,9 @@
 package bchain
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"log"
-	"strconv"
-	"strings"
 
 	"github.com/boltdb/bolt"
 )
@@ -35,6 +31,10 @@ type BlockCollection struct {
 
 // difficulty ...
 const difficulty = 4
+
+//-----------------------------------------
+// Exported functions
+//-----------------------------------------
 
 // AddBlock - saves the block in the blockchain database
 func (bc *Blockchain) AddBlock(newBlock *Block) error {
@@ -165,21 +165,7 @@ func (i *BlockchainIterator) next() *Block {
 	return block
 }
 
-// SHA256 hashing
-func calculateHash(block *Block) string {
-	record := strconv.Itoa(block.Index) + block.Timestamp + strconv.Itoa(block.BPM) + strconv.Itoa(block.Difficulty) + block.Nonce + string(block.PrevHash)
-
-	h := sha256.New()
-	h.Write([]byte(record))
-	hashed := h.Sum(nil)
-	return hex.EncodeToString(hashed)
-}
-
-func isHashValid(hash string, difficulty int) bool {
-	prefix := strings.Repeat("0", difficulty)
-	return strings.HasPrefix(hash, prefix)
-}
-
+// returns the last block
 func (bc *Blockchain) lastBlock() *Block {
 
 	var block *Block
@@ -202,6 +188,7 @@ func (bc *Blockchain) lastBlock() *Block {
 
 }
 
+// checks if it is a valid block
 func (bc *Blockchain) isBlockValid(newBlock *Block) bool {
 
 	lastBlock := bc.lastBlock()

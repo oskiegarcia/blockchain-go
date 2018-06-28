@@ -2,9 +2,13 @@ package bchain
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"encoding/gob"
+	"encoding/hex"
 	"fmt"
 	"log"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
@@ -20,6 +24,10 @@ type Block struct {
 	PrevHash   []byte
 	Hash       []byte
 }
+
+//-----------------------------------------
+// Exported functions
+//-----------------------------------------
 
 // GenerateBlock ...
 func (bc *Blockchain) GenerateBlock(BPM int) *Block {
@@ -50,6 +58,25 @@ func GenesisBlock() *Block {
 	spew.Dump(genesisBlock)
 
 	return genesisBlock
+}
+
+//-----------------------------------------
+// Unexported functions
+//-----------------------------------------
+
+// SHA256 hashing
+func calculateHash(block *Block) string {
+	record := strconv.Itoa(block.Index) + block.Timestamp + strconv.Itoa(block.BPM) + strconv.Itoa(block.Difficulty) + block.Nonce + string(block.PrevHash)
+
+	h := sha256.New()
+	h.Write([]byte(record))
+	hashed := h.Sum(nil)
+	return hex.EncodeToString(hashed)
+}
+
+func isHashValid(hash string, difficulty int) bool {
+	prefix := strings.Repeat("0", difficulty)
+	return strings.HasPrefix(hash, prefix)
 }
 
 // proofOfWork
