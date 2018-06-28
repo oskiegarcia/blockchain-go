@@ -37,33 +37,35 @@ func (bc *Blockchain) GenerateBlock(BPM int) *Block {
 	newBlock.BPM = BPM
 	newBlock.PrevHash = lastBlock.Hash
 	newBlock.Difficulty = difficulty
-
-	for i := 0; ; i++ {
-		hex := fmt.Sprintf("%x", i)
-		newBlock.Nonce = hex
-		if !isHashValid(calculateHash(newBlock), newBlock.Difficulty) {
-			//fmt.Println(calculateHash(newBlock), " do more work")
-			//time.Sleep(time.Second)
-			continue
-		} else {
-			fmt.Println(calculateHash(newBlock), fmt.Sprintf(" work done after %d iterations", i))
-			newBlock.Hash = []byte(calculateHash(newBlock))
-			break
-		}
-	}
+	newBlock.proofOfWork()
 
 	return newBlock
 }
 
-// GenesisBlock ...
+// GenesisBlock - creates the initial block
 func GenesisBlock() *Block {
 	t := time.Now()
-	genesisBlock := Block{}
-	genesisBlock = Block{0, t.String(), 0, difficulty, fmt.Sprintf("%x", 100), []byte{}, []byte(calculateHash(&genesisBlock))}
+	genesisBlock := &Block{0, t.String(), 0, difficulty, fmt.Sprintf("%x", 100), []byte{}, []byte{}}
+	genesisBlock.proofOfWork()
 	spew.Dump(genesisBlock)
-	//Blockchain = append(Blockchain, genesisBlock)
 
-	return &genesisBlock
+	return genesisBlock
+}
+
+// proofOfWork
+func (b *Block) proofOfWork() {
+
+	for i := 0; ; i++ {
+		hex := fmt.Sprintf("%x", i)
+		b.Nonce = hex
+		if !isHashValid(calculateHash(b), b.Difficulty) {
+			continue
+		} else {
+			fmt.Println(calculateHash(b), fmt.Sprintf(" work done after %d iterations", i))
+			b.Hash = []byte(calculateHash(b))
+			break
+		}
+	}
 }
 
 // Serialize serializes the block
