@@ -114,15 +114,38 @@ func NewBlockchain() *Blockchain {
 	return &bc
 }
 
-// Iterator - creates an iterator
-func (bc *Blockchain) Iterator() *BlockchainIterator {
+// List - retrieves all data from the blockchain database
+func (bc *Blockchain) List() *BlockCollection {
+	bci := bc.iterator()
+	var blockSlice []*Block
+	result := BlockCollection{}
+	for {
+		block := bci.next()
+		blockSlice = append(blockSlice, block)
+		//log.Printf("hash:%s\n", block.Hash)
+		if len(block.PrevHash) == 0 {
+			break
+		}
+	}
+
+	result.Blocks = blockSlice
+	result.Size = len(blockSlice)
+	return &result
+}
+
+//-----------------------------------------
+// Unexported functions
+//-----------------------------------------
+
+// iterator - creates an iterator
+func (bc *Blockchain) iterator() *BlockchainIterator {
 	bci := &BlockchainIterator{bc.tip, bc.Db}
 
 	return bci
 }
 
-// Next returns next block starting from the tip
-func (i *BlockchainIterator) Next() *Block {
+// next returns next block starting from the tip
+func (i *BlockchainIterator) next() *Block {
 	var block *Block
 
 	err := i.Db.View(func(tx *bolt.Tx) error {
@@ -141,29 +164,6 @@ func (i *BlockchainIterator) Next() *Block {
 
 	return block
 }
-
-// List - retrieves all data from the blockchain database
-func (bc *Blockchain) List() *BlockCollection {
-	bci := bc.Iterator()
-	var blockSlice []*Block
-	result := BlockCollection{}
-	for {
-		block := bci.Next()
-		blockSlice = append(blockSlice, block)
-		//log.Printf("hash:%s\n", block.Hash)
-		if len(block.PrevHash) == 0 {
-			break
-		}
-	}
-
-	result.Blocks = blockSlice
-	result.Size = len(blockSlice)
-	return &result
-}
-
-//-----------------------------------------
-// Unexported functions
-//-----------------------------------------
 
 // SHA256 hashing
 func calculateHash(block *Block) string {
