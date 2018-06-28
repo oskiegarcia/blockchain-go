@@ -17,8 +17,8 @@ type Block struct {
 	BPM        int
 	Difficulty int
 	Nonce      string
-	PrevHash   []byte `json:",string"`
-	Hash       []byte `json:",string"`
+	PrevHash   []byte
+	Hash       []byte
 }
 
 // GenerateBlock ...

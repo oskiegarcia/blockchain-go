@@ -27,6 +27,12 @@ type BlockchainIterator struct {
 	Db          *bolt.DB
 }
 
+// BlockCollection ...
+type BlockCollection struct {
+	Size   int
+	Blocks []*Block
+}
+
 // difficulty ...
 const difficulty = 4
 
@@ -137,20 +143,22 @@ func (i *BlockchainIterator) Next() *Block {
 }
 
 // List ...
-func (bc *Blockchain) List() []*Block {
+func (bc *Blockchain) List() *BlockCollection {
 	bci := bc.Iterator()
 	var blockSlice []*Block
-
+	result := BlockCollection{}
 	for {
 		block := bci.Next()
 		blockSlice = append(blockSlice, block)
-		log.Printf("hash:%s\n", block.Hash)
+		//log.Printf("hash:%s\n", block.Hash)
 		if len(block.PrevHash) == 0 {
 			break
 		}
 	}
 
-	return blockSlice
+	result.Blocks = blockSlice
+	result.Size = len(blockSlice)
+	return &result
 }
 
 //-----------------------------------------
