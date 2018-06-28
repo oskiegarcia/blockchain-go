@@ -36,7 +36,7 @@ type BlockCollection struct {
 // difficulty ...
 const difficulty = 4
 
-// AddBlock ...
+// AddBlock - saves the block in the blockchain database
 func (bc *Blockchain) AddBlock(newBlock *Block) error {
 
 	log.Printf("AddBlock: %d\n", newBlock.Index)
@@ -114,7 +114,7 @@ func NewBlockchain() *Blockchain {
 	return &bc
 }
 
-// Iterator ...
+// Iterator - creates an iterator
 func (bc *Blockchain) Iterator() *BlockchainIterator {
 	bci := &BlockchainIterator{bc.tip, bc.Db}
 
@@ -142,7 +142,7 @@ func (i *BlockchainIterator) Next() *Block {
 	return block
 }
 
-// List ...
+// List - retrieves all data from the blockchain database
 func (bc *Blockchain) List() *BlockCollection {
 	bci := bc.Iterator()
 	var blockSlice []*Block
